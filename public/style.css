@@ -31,7 +31,7 @@ h1 {
   float: left;
 }
 
-.navigation .logout {
+.navigation .logout { /* for log out button */
   float: right;
 }
 
