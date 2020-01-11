@@ -3,7 +3,6 @@ const _ = require('lodash');
 
 const executeQuery = (query, values) => {
   return db.queryAsync(query, values).spread(results => {
-    console.log('model.js executeQuery... spread results:', results);
     return results});
 };
 
@@ -22,7 +21,7 @@ const parseData = options => {
  */
 class Model {
   constructor(tablename) {
-    this.tablename = tablename;
+    this.tablename = tablename; // tablename depends on class's super(' tablename ')
   }
 
   /**

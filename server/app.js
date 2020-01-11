@@ -8,7 +8,7 @@ const models = require('./models');
 
 const app = express();
 
-app.set('views', `${__dirname}/views`);
+app.set('views', `${__dirname}/views`); // renders files in this directory
 app.set('view engine', 'ejs');
 app.use(partials());
 app.use(bodyParser.json());
@@ -17,14 +17,22 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 
 
-app.get('/',
+app.get('/', // https://www.shortly.com/
 (req, res) => {
-  // if cookie then show links
-  // res.render('index');
-  // if no cookie then signup
+
+  // if cookie
+    // if not expired
+      // show links
+    // else (if expired)
+      // show login
+  // else if no cookie then signup
+
+  // temporary until we write the pseudocode above
+  // original: res.render('index');
   res.render('signup');
 });
 
+// is this needed?
 app.get('/login',
 (req, res) => {
 
@@ -38,11 +46,12 @@ app.get('/create',
 
 app.get('/links',
 (req, res, next) => {
-  models.Links.getAll()
+  models.Links.getAll() // no argument gets all links
     .then(links => {
       res.status(200).send(links);
     })
     .error(error => {
+      // console.log('app.get /links:', error)
       res.status(500).send(error);
     });
 });
@@ -52,13 +61,13 @@ app.post('/links',
   var url = req.body.url;
   if (!models.Links.isValidUrl(url)) {
     // send back a 404 if link is not valid
-    console.log('app.post/links', req.body, url);
     return res.sendStatus(404);
   }
 
   return models.Links.get({ url })
     .then(link => {
       if (link) {
+        // console.log('app.post(\'/links: models.Links.get', link)
         throw link;
       }
       return models.Links.getUrlTitle(url);
@@ -77,6 +86,7 @@ app.post('/links',
       throw link;
     })
     .error(error => {
+      // console.log('app.post /links error:', error)
       res.status(500).send(error);
     })
     .catch(link => {
@@ -93,16 +103,21 @@ app.post('/signup',
 (req, res, next) => {
 
   // does the user already exist?
+  // models.Users.get({username: req.body.username}).then(data => console.log(data));
 
   return models.Users.create(
     {username: req.body.username, password: req.body.password}
     ).then(user => {
       // see if user exists first, if so send feedback; if not then proceed
       // send back cookie
+      // console.log('models.Users.create user:', user);
+      res.location('index');
       res.render('index'); // change to login???
-
-      console.log('server app.js app.post/signup:', user);
-    })
+    }).catch(err => {
+      // send
+      res.location('signup');
+      res.render('signup');
+    });
 });
 
 
@@ -112,18 +127,33 @@ app.post('/login',
 
   // does the user already exist?
   let user = {username: req.body.username, password: req.body.password};
+  // check if the username exists -- models.Users.get
+  // check if the username entered the right password
+
+  // select salt from users where username = req.body.username
+  return models.Users.get(salt: )
+  models.Users.get({password: utils.createHash(req.body.password)})
+    .then(results => {
+      console.log('login hashed password:', results, 'for password: ', req.body.password);
+      // models.Users.compare( /* results??? user object??? */ )
+    }).catch(err => console.log('login hashed error', err))
+
+  // was password correct?
+
+  // get user's links from database
+
+  models.Links.getAll()
+    .then(links => {
+      res.status(200).send(links);
+    })
+    .error(error => {
+      res.status(500).send(error);
+    });
+
+  // render user's personal links page
 
   // return models.Users.getAll(user).then(data => console.log(data))
 
-  // return models.Users.create(
-  //   {username: req.body.username, password: req.body.password}
-  //   ).then(user => {
-  //     // see if user exists first, if so send feedback; if not then proceed
-  //     // send back cookie and user's links
-  //     res.render('index');
-  //     // reroute browser to linksView.js
-  //     console.log('server app.js app.post/signup:', user);
-  //   })
 });
 
 /************************************************************/
