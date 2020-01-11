@@ -2,7 +2,9 @@ const db = require('../db');
 const _ = require('lodash');
 
 const executeQuery = (query, values) => {
-  return db.queryAsync(query, values).spread(results => results);
+  return db.queryAsync(query, values).spread(results => {
+    console.log('model.js executeQuery... spread results:', results);
+    return results});
 };
 
 const parseData = options => {
@@ -65,7 +67,7 @@ class Model {
    * containing the results of the query or is rejected with the the error that occurred
    * during the query.
    */
-  create(options) {
+  create(options) {//
     let queryString = `INSERT INTO ${this.tablename} SET ?`;
     return executeQuery(queryString, options);
   }

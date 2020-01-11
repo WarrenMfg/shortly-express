@@ -12,7 +12,10 @@ module.exports = (db) => {
       baseUrl VARCHAR(255),
       code VARCHAR(5),
       title VARCHAR(255),
-      visits INT NOT NULL DEFAULT 0
+      visits INT NOT NULL DEFAULT 0,
+      user_id INT NOT NULL,
+      FOREIGN KEY (user_id) INT NOT NULL DEFAULT 0
+        REFERENCES users(id)
     );`)
     .then(() => {
       // Create clicks table

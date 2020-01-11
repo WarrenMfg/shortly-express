@@ -28,7 +28,7 @@ class Links extends Model {
       let match = response.body.match(tag);
       let title = match ? match[1] : url;
       return title;
-    }); 
+    });
   }
 
   /**
@@ -36,7 +36,7 @@ class Links extends Model {
    * @param {string} url - The url to check for validity.
    * @returns {boolean} Returns a boolean indicating if the url is valid.
    */
-  isValidUrl(url) {
+  isValidUrl(url) { //
     return url.match(this.rValidUrl);
   }
 

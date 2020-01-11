@@ -16,7 +16,7 @@ exports.createHash = (data, salt = '') => {
   let shasum = crypto.createHash('sha256');
   shasum.update(data + salt);
   return shasum.digest('hex');
-};
+}; // returns a string with a the hashed value
 
 /**
  * Compares a value and a salt with a previously hashed value.
@@ -28,7 +28,7 @@ exports.createHash = (data, salt = '') => {
  */
 exports.compareHash = (attempted, stored, salt) => {
   return stored === this.createHash(attempted, salt);
-};
+}; // returns boolean
 
 /**
  * Creates a random 32 byte string.
@@ -36,4 +36,4 @@ exports.compareHash = (attempted, stored, salt) => {
  */
 exports.createRandom32String = () => {
   return crypto.randomBytes(32).toString('hex');
-};
+}; // returns string

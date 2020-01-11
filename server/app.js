@@ -17,17 +17,26 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 
 
-app.get('/', 
+app.get('/',
+(req, res) => {
+  // if cookie then show links
+  // res.render('index');
+  // if no cookie then signup
+  res.render('signup');
+});
+
+app.get('/login',
+(req, res) => {
+
+  res.render('login');
+});
+
+app.get('/create',
 (req, res) => {
   res.render('index');
 });
 
-app.get('/create', 
-(req, res) => {
-  res.render('index');
-});
-
-app.get('/links', 
+app.get('/links',
 (req, res, next) => {
   models.Links.getAll()
     .then(links => {
@@ -38,11 +47,12 @@ app.get('/links',
     });
 });
 
-app.post('/links', 
+app.post('/links',
 (req, res, next) => {
   var url = req.body.url;
   if (!models.Links.isValidUrl(url)) {
     // send back a 404 if link is not valid
+    console.log('app.post/links', req.body, url);
     return res.sendStatus(404);
   }
 
@@ -77,8 +87,44 @@ app.post('/links',
 /************************************************************/
 // Write your authentication routes here
 /************************************************************/
+// These routes should enable a user to register for a new account and for users to log in to your application.
+// POST: '/signup' username and password
+app.post('/signup',
+(req, res, next) => {
+
+  // does the user already exist?
+
+  return models.Users.create(
+    {username: req.body.username, password: req.body.password}
+    ).then(user => {
+      // see if user exists first, if so send feedback; if not then proceed
+      // send back cookie
+      res.render('index'); // change to login???
+
+      console.log('server app.js app.post/signup:', user);
+    })
+});
 
 
+// POST: '/login' username and password
+app.post('/login',
+(req, res, next) => {
+
+  // does the user already exist?
+  let user = {username: req.body.username, password: req.body.password};
+
+  // return models.Users.getAll(user).then(data => console.log(data))
+
+  // return models.Users.create(
+  //   {username: req.body.username, password: req.body.password}
+  //   ).then(user => {
+  //     // see if user exists first, if so send feedback; if not then proceed
+  //     // send back cookie and user's links
+  //     res.render('index');
+  //     // reroute browser to linksView.js
+  //     console.log('server app.js app.post/signup:', user);
+  //   })
+});
 
 /************************************************************/
 // Handle the code parameter route last - if all other routes fail
@@ -86,7 +132,7 @@ app.post('/links',
 // If the short-code doesn't exist, send the user to '/'
 /************************************************************/
 
-app.get('/:code', (req, res, next) => {
+app.get('/:code', (req, res, next) => { // our shortly code???
 
   return models.Links.get({ code: req.params.code })
     .tap(link => {
