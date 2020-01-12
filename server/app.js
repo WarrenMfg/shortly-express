@@ -35,17 +35,21 @@ app.get('/', Auth.verifySession, (req, res) => { // callback
 });
 
 // is this needed?
-// app.get('/login',
-// (req, res) => {
-//   res.render('login');
-// });
+app.get('/login',
+(req, res) => {
+  res.render('login');
+});
+
+app.get('/signup',
+(req, res) => {
+  res.render('signup');
+});
 
 app.get('/create', Auth.verifySession, (req, res) => {
   res.render('index');
 });
 
-app.get('/links', Auth.verifySession,
-(req, res, next) => {
+app.get('/links', Auth.verifySession, (req, res, next) => {
   models.Links.getAll() // no argument gets all links
     .then(links => {
       res.status(200).send(links);
@@ -56,8 +60,7 @@ app.get('/links', Auth.verifySession,
     });
 });
 
-app.post('/links', Auth.verifySession,
-(req, res, next) => {
+app.post('/links', Auth.verifySession, (req, res, next) => {
   var url = req.body.url;
   if (!models.Links.isValidUrl(url)) {
     // send back a 404 if link is not valid
@@ -119,15 +122,15 @@ app.post('/signup',
     })
     .then(results => {
       // session stuff
-      console.log('signup after create promise', results);
-      return models.Sessions.update({id: req.session.id}, {userId: results.insertId});
+      // console.log('signup after create promise', results);
+      return models.Sessions.update({hash: req.session.hash}, {userId: results.insertId});
     })
     .then(() => {
       // once signed in go to /
       res.redirect('/');
     })
     .error(err => { // occurs on error (promise rejection)
-      console.log('err in signup', err);
+      // console.log('err in signup', err);
       res.status(500).send(err);
     })
     .catch(user => { // catch exceptions (for throw)
@@ -157,6 +160,8 @@ app.post('/signup',
 // POST: '/login' username and password
 app.post('/login',
 (req, res, next) => {
+  let username = req.body.username;
+  let password = req.body.password;
 
   return models.Users.get({username})
     .then(user => {
@@ -165,13 +170,17 @@ app.post('/login',
         throw user;
       }
 
-      return models.Sessions.update({id: req.session.id}, {userId: user.id});
+      return models.Sessions.update({hash: req.session.hash}, {userId: user.id});
 
     })
     .then(() => {
       // go to main
       res.redirect('/');
     }) // add error here?
+    .error(err => {
+      // console.log('login error', err)
+      res.status(500).send(err);
+    })
     .catch(() => {
       res.redirect('/login');
     })
@@ -214,6 +223,18 @@ app.post('/login',
 
   // return models.Users.getAll(user).then(data => console.log(data))
 
+});
+
+app.get('/logout', (req, res, next) => {
+
+  return models.Sessions.delete({hash: req.cookies.shortlyid})
+    .then(() => {
+      res.clearCookie('shortlyid');
+      res.redirect('/login');
+    })
+    .error(error => {
+      res.status(500).send(error);
+    });
 });
 
 /************************************************************/

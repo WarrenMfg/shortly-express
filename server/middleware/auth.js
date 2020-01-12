@@ -4,15 +4,15 @@ const Promise = require('bluebird');
 module.exports.createSession = (req, res, next) => {
 
   // req.cookies --> .nameTheCookieWhateverYouWant
-  Promise.resolve(req.cookies.shortlyID) // create promise; chain with then() statements
-    .then(num => {
-      if (!num) {
+  Promise.resolve(req.cookies.shortlyid) // create promise; chain with then() statements
+    .then(hash => {
+      if (!hash) {
         // geneate session
-        throw num;
+        throw hash;
       }
 
       // load session
-      return models.Sessions.get({num}) // returns promise
+      return models.Sessions.get({hash}) // returns promise
 
     })
     .then(session => { // what is tap? passes argument to next chain link --bluebird?
@@ -31,7 +31,7 @@ module.exports.createSession = (req, res, next) => {
         })
         .then(session => { // what is tap? passes argument to next chain link --bluebird?
           // console.log('session catch', session);
-          res.cookie('shortlyID', session.hash);
+          res.cookie('shortlyid', session.hash);
           return session;
         })
     })

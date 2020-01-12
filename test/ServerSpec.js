@@ -25,7 +25,6 @@ describe('', function() {
     var count = 0;
     tablenames.forEach(function(tablename) {
       connection.query('DROP TABLE IF EXISTS ' + tablename, function() {
-        // console.log('tablename to be dropped:', tablename);
         count++;
         if (count === tablenames.length) {
           return schema(db).then(done);
@@ -63,7 +62,7 @@ describe('', function() {
   });
 
   describe('Database Schema:', function() {
-    it('contains a users table', function(done) { // PASS
+    it('contains a users table', function(done) {
       var queryString = 'SELECT * FROM users';
       db.query(queryString, function(err, results) {
         if (err) { return done(err); }
@@ -73,7 +72,7 @@ describe('', function() {
       });
     });
 
-    it('contains id, username, password columns', function(done) { // PASS
+    it('contains id, username, password columns', function(done) {
       var newUser = {
         username: 'Howard',
         password: 'p@ssw0rd'
@@ -89,7 +88,7 @@ describe('', function() {
       });
     });
 
-    it('only allows unique usernames', function(done) { // PASS?
+    it('only allows unique usernames', function(done) {
       var newUser = {
         username: 'Howard',
         password: 'p@ssw0rd'
@@ -104,7 +103,7 @@ describe('', function() {
       });
     });
 
-    it('should increment the id of new rows', function(done) { // PASS
+    it('should increment the id of new rows', function(done) {
       var newUser = {
         username: 'Howard',
         password: 'p@ssw0rd'
@@ -124,7 +123,8 @@ describe('', function() {
     });
   });
 
-  describe('Account Creation:', function() {
+
+  describe ('Account Creation:', function() {
 
     it('signup creates a new user record', function(done) {
       var options = {
@@ -139,10 +139,7 @@ describe('', function() {
       request(options, function(error, res, body) {
         var queryString = 'SELECT * FROM users where username = "Samantha"';
         db.query(queryString, function(err, rows) {
-          if (err) {
-
-            done(err);
-          }
+          if (err) { done(err); }
           var user = rows[0];
           expect(user).to.exist;
           expect(user.username).to.equal('Samantha');
@@ -165,9 +162,7 @@ describe('', function() {
         if (error) { return done(error); }
         var queryString = 'SELECT password FROM users where username = "Samantha"';
         db.query(queryString, function(err, rows) {
-          if (err) {
-            return done (err);
-          }
+          if (err) { return done (err); }
           var user = rows[0];
           expect(user.password).to.exist;
           expect(user.password).to.not.equal('Samantha');
@@ -190,8 +185,7 @@ describe('', function() {
         if (error) { return done(error); }
         request(options, function(err, response, resBody) {
           if (err) { return done(err); }
-
-          expect(response.headers.location).to.equal('signup'); // was '/signup'
+          expect(response.headers.location).to.equal('/signup');
           done();
         });
       });
@@ -208,16 +202,15 @@ describe('', function() {
       };
 
       request(options, function(error, res, body) {
-        if (error) {
-          return done(error); }
-
-        expect(res.headers.location).to.equal('index'); // was '/'
+        if (error) { return done(error); }
+        expect(res.headers.location).to.equal('/');
         done();
       });
     });
   });
 
-  describe('Account Login:', function() {
+
+  describe ('Account Login:', function() {
 
     beforeEach(function(done) {
       var options = {
@@ -246,12 +239,12 @@ describe('', function() {
 
       request(options, function(error, res, body) {
         if (error) { return done(error); }
-        expect(res.headers.location).to.equal('index');
+        expect(res.headers.location).to.equal('/');
         done();
       });
     });
 
-    xit('Users that do not exist are kept on login page', function(done) {
+    it('Users that do not exist are kept on login page', function(done) {
       var options = {
         'method': 'POST',
         'uri': 'http://127.0.0.1:4568/login',
@@ -268,7 +261,7 @@ describe('', function() {
       });
     });
 
-    xit('Users that enter an incorrect password are kept on login page', function(done) {
+    it('Users that enter an incorrect password are kept on login page', function(done) {
       var options = {
         'method': 'POST',
         'uri': 'http://127.0.0.1:4568/login',
@@ -286,7 +279,8 @@ describe('', function() {
     });
   });
 
-  xdescribe('Sessions Schema:', function() {
+
+  describe ('Sessions Schema:', function() {
     it('contains a sessions table', function(done) {
       var queryString = 'SELECT * FROM sessions';
       db.query(queryString, function(err, results) {
@@ -334,7 +328,8 @@ describe('', function() {
     });
   });
 
-  xdescribe('Express Middleware', function() {
+
+  describe ('Express Middleware', function() {
     var cookieParser = require('../server/middleware/cookieParser.js');
     var createSession = require('../server/middleware/auth.js').createSession;
 
@@ -489,7 +484,8 @@ describe('', function() {
     });
   });
 
-  xdescribe('Sessions and cookies', function() {
+
+  describe ('Sessions and cookies', function() {
     var requestWithSession;
     var cookieJar;
 
@@ -579,7 +575,8 @@ describe('', function() {
     });
   });
 
-  xdescribe('Privileged Access:', function() {
+
+  describe ('Privileged Access:', function() {
 
     it('Redirects to login page if a user tries to access the main page and is not signed in', function(done) {
       request('http://127.0.0.1:4568/', function(error, res, body) {
@@ -606,7 +603,8 @@ describe('', function() {
     });
   });
 
-  xdescribe('Link creation:', function() {
+
+  describe ('Link creation:', function() {
 
     var cookies = request.jar();
     var requestWithSession = request.defaults({ jar: cookies });
@@ -619,7 +617,9 @@ describe('', function() {
       }
     };
 
-    xbeforeEach(function(done) {
+
+    beforeEach
+    (function(done) {
       var options = {
         'method': 'POST',
         'followAllRedirects': true,
